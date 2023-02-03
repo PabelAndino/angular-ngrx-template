@@ -19,6 +19,9 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EnvironmentComponent } from './environment/environment.component';
+import { StoreModule } from '@ngrx/store';
+import { appReducers } from './app.reducer';
+import { StoreDevtools, StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 
 @NgModule({
@@ -41,7 +44,11 @@ import { EnvironmentComponent } from './environment/environment.component';
     ReactiveFormsModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
-    AngularFireAuthModule
+    StoreModule.forRoot(appReducers),
+    StoreDevtoolsModule.instrument({
+      maxAge:25, //retain last 25 characters
+      logOnly: environment.production
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

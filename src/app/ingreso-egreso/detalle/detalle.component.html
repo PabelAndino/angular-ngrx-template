@@ -15,11 +15,21 @@
                     </thead>
 
                     <tbody>
-                        <tr>
-                            <td>Descripción</td>
-                            <td>Monto</td>
-                            <td>Tipo</td>
-                            <td>acciones</td>
+                        <tr *ngFor="let item of ingresosEgresos">
+                            <td>{{item.descripcion}}</td>
+                            <td>{{item.monto| currency}}</td>
+                            <td 
+                            
+                            ><span 
+                                    [ngClass]="item.tipo === 'ingreso' ? 'badge rounded-pill badge-success shadow rounded' : 'badge rounded-pill badge-warning shadow rounded' "
+
+                                
+                            >
+                                {{item.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}}
+                            </span>
+                                
+                            </td>
+                            <td><button (click)="borrar(item.uid)"  class="btn btn-danger btn-sm "><i class="fa fa-trash"></i> Delete</button></td>
                         </tr>
                     </tbody>
 

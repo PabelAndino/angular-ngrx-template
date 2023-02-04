@@ -5,32 +5,43 @@ import { Store } from '@ngrx/store';
 import { map, Subscription } from 'rxjs';
 import { AppState } from '../app.reducer';
 import * as authActions from '../auth/auth.actions';
+import { unsetItems } from '../ingreso-egreso/ingreso-egreso.actions';
 import { Usuario } from '../models/usuario.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService  {
+export class AuthService {
 
   userSubscripton: Subscription = new Subscription
+  private _user!: Usuario | null;
 
-  constructor(public auth: AngularFireAuth, private firesotre:AngularFirestore, private store: Store<AppState>) { }
+  get user(){
+    return this._user // para prevenir mutaciones deberia de ser return {...this._user}
+  }
+
+  constructor(public auth: AngularFireAuth, private firesotre: AngularFirestore, private store: Store<AppState>) { }
 
   initAuthListener() {
     this.auth.authState.subscribe(firebaseUser => {
-        //implement the servece ones it is succesfully
-        if(firebaseUser){
-         this.userSubscripton = this.firesotre.doc(`${firebaseUser.uid}/usuario`).valueChanges().
-          subscribe((firestoreUser: any)=>{ //preferiblemente remover el any y descomentar la linea 26
+      //implement the servece ones it is succesfully
+      if (firebaseUser) {
+        this.userSubscripton = this.firesotre.doc(`${firebaseUser.uid}/usuario`).valueChanges().
+          subscribe((firestoreUser: any) => { //preferiblemente remover el any y descomentar la linea 26
             const user = Usuario.fromFireStore(firestoreUser)
-
+            //obtiene el usuario para mandarselo a ingreso-egreso.service
+            this._user = user
             this.store.dispatch(authActions.setUser({ user }))
             //this.store.dispatch(authActions.setUser({user:{...firestoreUser as Usuario}}))
+            
           })
-        }else{
-          this.userSubscripton.unsubscribe()
-          this.store.dispatch(authActions.unSetUser())
-        }
+      } else {
+        this._user = null
+    
+        this.userSubscripton.unsubscribe()
+        this.store.dispatch(authActions.unSetUser())
+        this.store.dispatch(unsetItems())
+      }
     })
   }
 
